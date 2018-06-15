@@ -1,3 +1,6 @@
 # project files
 .project
 .pydevproject
+
+#database file
+*.db
