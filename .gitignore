@@ -1,6 +1,7 @@
 # project files
 .project
 .pydevproject
-
+node_modules/*
+.settings/*
 #database file
 *.db
