@@ -18,7 +18,6 @@ class Popup extends Component {
  * Class that represents a single card that can be flipped and matched with other cards.
 */
 class Card extends Component {
-
   render() {
     return (
       <button className="card" onClick={this.props.onClick}>
@@ -91,7 +90,8 @@ class App extends Component {
    * Initialize matching pairs of cards
    */
   makePairs() {
-    var arr = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20];
+    var arr = Array.from({length: 20}, (v, k) => k+1); //card ids
+    var arr2 = Array.from({length: 60}, (v, k) => k+1); //image ids
     var ret = [];
     
     var rInt = (max, ex) => {
@@ -124,9 +124,13 @@ class App extends Component {
     while (arr.length > 0) {
       let inds = randoms(arr.length);
       var pair = {id1: arr[inds.r1], id2: arr[inds.r2]};
+      var imgIndex = rInt(arr2.length, -1);
+      pair.img = "images/" + arr2[imgIndex] + ".jpg";
       ret.push(pair);
       arr = arrCpy(arr, pair.id1, pair.id2);
+      arr2 = arrCpy(arr2, arr2[imgIndex], -1);
     }
+
     console.log(ret);
     return ret;
   }

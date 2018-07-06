@@ -97,10 +97,10 @@ body {
 }
 .card_container {
   display: inline-block;
-  width: 70px;
-  height: 70px;
+  width: 132px;
+  height: 132px;
 }
 .card {
-  width: 67px;
-  height: 67px;
+  width: 128px;
+  height: 128px;
 }
