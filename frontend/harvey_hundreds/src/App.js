@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import './App.css';
 import GameApi from './api'
 
 /** 
@@ -8,7 +7,7 @@ import GameApi from './api'
 class Popup extends Component {
   render() {
     return (
-      <div className="modal fade" role={this.props.role}>
+      <div className="modal" role={this.props.role}>
         {this.props.renderContent()}
       </div>
     );
@@ -19,6 +18,7 @@ class Popup extends Component {
  * Class that represents a single card that can be flipped and matched with other cards.
 */
 class Card extends Component {
+
   render() {
     return (
       <button className="card" onClick={this.props.onClick}>
@@ -36,14 +36,22 @@ class App extends Component {
     super(props);
     this.gameApi = new GameApi();
     this.state = this.initGameState();
+    this.clock = null;
+
+    this.startGame = this.startGame.bind(this);
+    this.timeDecrement = this.timeDecrement.bind(this);
+    this.moneyAmount = this.moneyAmount.bind(this);
+    this.calculateEfficiency = this.calculateEfficiency.bind(this);
   }
 
   initGameState() {
     return {
       matches: 0,
       timeLeft: 60.0,
+      gameRunning: false,
+
       cardFlips: 0,
-      oneCardFlipped: false,
+      cardSelected: null,
       pairs: this.makePairs(),
       cards: [
         {id: 1, flipped: false, inPlay: true},
@@ -68,6 +76,15 @@ class App extends Component {
         {id: 20, flipped: false, inPlay: true}
       ]
     };
+  }
+
+  calculateEfficiency() {
+    const matches = this.state.matches;
+    const flips = this.state.cardFlips % 2 === 0 ? this.state.cardFlips : this.state.cardFlips - 1; //only an even number of card flips can count as a valid set of attempts.
+
+    const standard_efficiency = matches == 0 ? 0 : (2*matches) + 1;
+    const user_efficiency = (2*matches) > flips ? (2*matches) + 1 : flips + 1;
+    return standard_efficiency/user_efficiency;
   }
 
   /**
@@ -141,43 +158,95 @@ class App extends Component {
       <Card onClick={() => this.handleClick(id)} value={id}/>
     );
   }
+
   handleClick(id) {
-     alert("Clicked "+id+"!");
+     if (this.state.cardSelected === null) {
+       let cardz = this.state.cards;
+       cardz[id-1].flipped = true;
+       this.setState({
+         cardSelected: this.state.cards[id-1],
+         cards: cardz
+       });
+     }
+  }
+
+  moneyAmount() {
+    if (this.state.matches === 0) {
+      return "$0";
+    }
+    else {
+      return "$"+(this.state.matches*100);
+    }
+  }
+
+  timeDecrement() {
+    const running = this.state.gameRunning;
+    const time = this.state.timeLeft;
+    if (running) {
+      this.setState({
+        timeLeft: this.state.timeLeft - 0.1
+      });
+    }
+    if (time < 0.1) {
+      this.setState({
+        timeLeft: 0,
+        gameRunning: false
+      });
+      clearInterval(this.clock);
+    }
+  }
+
+  startGame() {
+    if (!this.state.gameRunning) {
+      this.setState({
+        gameRunning: true
+      });
+      this.clock = setInterval(this.timeDecrement, 100);
+    }
   }
 
   render() {
-    return (
-        <div className="cards_container">
-          <div className="card_row">
-            <div className="card_container">{this.renderCard(1)}</div>
-            <div className="card_container">{this.renderCard(2)}</div>            
-            <div className="card_container">{this.renderCard(3)}</div>   
-            <div className="card_container">{this.renderCard(4)}</div>            
-            <div className="card_container">{this.renderCard(5)}</div>         
+      return (
+        <div className="game_container">
+            <div className="info_container">
+              <p>{this.moneyAmount()}</p>
+              <p>{parseFloat(Math.round((this.state.timeLeft)*100) / 100).toFixed(1)}</p>
+            </div>
+            <div className="cards_container">
+              <div className="card_row">
+                <div className="card_container">{this.renderCard(1)}</div>
+                <div className="card_container">{this.renderCard(2)}</div>            
+                <div className="card_container">{this.renderCard(3)}</div>   
+                <div className="card_container">{this.renderCard(4)}</div>            
+                <div className="card_container">{this.renderCard(5)}</div>         
+              </div>
+              <div className="card_row">
+                <div className="card_container">{this.renderCard(6)}</div>
+                <div className="card_container">{this.renderCard(7)}</div>            
+                <div className="card_container">{this.renderCard(8)}</div>   
+                <div className="card_container">{this.renderCard(9)}</div>            
+                <div className="card_container">{this.renderCard(10)}</div>  
+              </div>
+              <div className="card_row">
+                <div className="card_container">{this.renderCard(11)}</div>
+                <div className="card_container">{this.renderCard(12)}</div>            
+                <div className="card_container">{this.renderCard(13)}</div>   
+                <div className="card_container">{this.renderCard(14)}</div>            
+                <div className="card_container">{this.renderCard(15)}</div>  
+              </div>
+              <div className="card_row">
+                <div className="card_container">{this.renderCard(16)}</div>
+                <div className="card_container">{this.renderCard(17)}</div>            
+                <div className="card_container">{this.renderCard(18)}</div>   
+                <div className="card_container">{this.renderCard(19)}</div>            
+                <div className="card_container">{this.renderCard(20)}</div>  
+              </div>
+            </div>
+            <button id="start" onClick={() => this.startGame()}>
+              {this.state.gameRunning ? "GAME RUNNING" : "GAME STOPPED"}
+            </button> 
           </div>
-          <div className="card_row">
-            <div className="card_container">{this.renderCard(6)}</div>
-            <div className="card_container">{this.renderCard(7)}</div>            
-            <div className="card_container">{this.renderCard(8)}</div>   
-            <div className="card_container">{this.renderCard(9)}</div>            
-            <div className="card_container">{this.renderCard(10)}</div>  
-          </div>
-          <div className="card_row">
-            <div className="card_container">{this.renderCard(11)}</div>
-            <div className="card_container">{this.renderCard(12)}</div>            
-            <div className="card_container">{this.renderCard(13)}</div>   
-            <div className="card_container">{this.renderCard(14)}</div>            
-            <div className="card_container">{this.renderCard(15)}</div>  
-          </div>
-          <div className="card_row">
-            <div className="card_container">{this.renderCard(16)}</div>
-            <div className="card_container">{this.renderCard(17)}</div>            
-            <div className="card_container">{this.renderCard(18)}</div>   
-            <div className="card_container">{this.renderCard(19)}</div>            
-            <div className="card_container">{this.renderCard(20)}</div>  
-          </div>
-        </div>
-    );
+      );
   }
 }
 
