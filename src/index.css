@@ -1,0 +1,140 @@
+@-webkit-keyframes CARD-FLIP-AWAY {
+  0%   { width: 67px; height: 67px; }
+  100% { width: 0px; height: 70px; }
+}
+
+@-moz-keyframes CARD-FLIP-AWAY {
+  0%   { width: 67px; height: 67px; }
+  100% { width: 0px; height: 70px; }
+}
+
+@-o-keyframes CARD-FLIP-AWAY {
+  0%   { width: 67px; height: 67px; }
+  100% { width: 0px; height: 70px; }
+}
+
+@keyframes CARD-FLIP-AWAY {
+  0%   { width: 67px; height: 67px; }
+  100% { width: 0px; height: 70px; }
+}
+
+@-webkit-keyframes CARD-FLIP-IN {
+  0%   { width: 0px; height: 70px; }
+  100% { width: 67px; height: 67px; }
+}
+
+@-moz-keyframes CARD-FLIP-IN {
+  0%   { width: 0px; height: 70px; }
+  100% { width: 67px; height: 67px; }
+}
+
+@-o-keyframes CARD-FLIP-IN {
+  0%   { width: 0px; height: 70px; }
+  100% { width: 67px; height: 67px; }
+}
+
+@keyframes CARD-FLIP-IN {
+  0%   { width: 0px; height: 70px; }
+  100% { width: 67px; height: 67px; }
+}
+
+.card_flip_away {
+  -webkit-animation-name:CARD-FLIP-AWAY;
+  -moz-animation-name: CARD-FLIP-AWAY;
+  -o-animation-name: CARD-FLIP-AWAY;
+  animation-name: CARD-FLIP-AWAY;
+  -webkit-animation-duration: 0.5s;
+  -moz-animation-duration: 0.5s;
+  -o-animation-duration: 0.5s; 
+  animation-duration: 5s;
+  -webkit-animation-timing-function: ease-in;
+  -moz-animation-timing-function: ease-in;
+  -o-animation-timing-function: ease-in;
+  animation-timing-function: ease-in; 
+}
+
+.card_flip_in {
+  -webkit-animation-name:CARD-FLIP-IN;
+  -moz-animation-name: CARD-FLIP-IN;
+  -o-animation-name: CARD-FLIP-IN;
+  animation-name: CARD-FLIP-IN;
+  -webkit-animation-duration: 0.5s;
+  -moz-animation-duration: 0.5s;
+  -o-animation-duration: 0.5s; 
+  animation-duration: 5s;
+  -webkit-animation-timing-function: ease-out;
+  -moz-animation-timing-function: ease-out;
+  -o-animation-timing-function: ease-out;
+  animation-timing-function: ease-out; 
+}
+button {
+	margin: 0 auto;
+	padding: 0;
+	border: 0;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: sans-serif;
+}
+
+.c_container { 
+  padding: 0;
+  display: inline-block;
+}
+
+.card_container {
+  margin: 0 auto;
+}
+.card_image {
+	max-width: 100%;
+	max-height: 100%;
+	height: auto;
+}
+
+@media screen and (max-width: 345px) {
+	.card {
+	  width: 56px;
+	  height: 56px;
+	}
+	.c_container {
+		width: 60px;
+		height: 72px;
+	}
+	.card_container {
+		width: 280px;
+		height: 360px;
+	}
+}
+
+@media screen and (max-width: 519px) and (min-width: 346px) {
+	.card {
+	  width: 64px;
+	  height: 64px;
+	}
+	.c_container {
+		width: 72px;
+		height: 84px;
+	}
+	.card_container {
+		width: 360px;
+		height: 420px;
+	}
+}
+
+@media screen and (min-width: 520px) {
+	.card {
+	  width: 116px;
+	  height: 116px;
+	}
+	.c_container {
+		width: 120px;
+		height: 128px;
+	}
+	.card_container {
+		width: 520px;
+		height: 640px;
+	}
+}
+
