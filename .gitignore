@@ -5,3 +5,6 @@ node_modules/*
 .settings/*
 #database file
 *.db
+#other
+.DS_Store
+**/.DS_Store

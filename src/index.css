@@ -92,7 +92,9 @@ body {
 	max-height: 100%;
 	height: auto;
 }
-
+#modal_trigger {
+	visibility: hidden;
+}
 @media screen and (max-width: 345px) {
 	.card {
 	  width: 56px;

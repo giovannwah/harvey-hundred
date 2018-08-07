@@ -1,6 +1,114 @@
 import React, { Component } from 'react';
-import GameApi from './api'
-import Modal from 'react-bootstrap-modal';
+import GameApi from './api';
+// import $ from 'jquery';
+// import Modal from 'react-bootstrap-modal'
+
+class Popup extends Component {
+	
+	getBody() {
+		switch (this.props.page) {
+			case 1: // start screen
+				return (
+					<div>
+						<h2>Welcome to Harvey's Hundreds!</h2>
+					</div>
+				);
+			case 2: // add score
+				return (
+					<div>
+						<form>
+						  <div class="form-group">
+						    <label for="exampleInputEmail1">Email address</label>
+						    <input type="text" class="form-control" id="input_username" aria-describedby="usernameHelp" placeholder="Enter a username for this high score." />
+						    <small id="emailHelp" class="form-text text-muted">No more than 15 characters in a username</small>
+						  </div>
+						  <button type="submit" class="btn btn-primary">Submit</button>
+						</form>
+					</div>
+				);
+			default: // highscores
+				return (
+				<div>
+					<ul class="list-group">
+					  <li class="list-group-item">Cras justo odio</li>
+					  <li class="list-group-item">Dapibus ac facilisis in</li>
+					  <li class="list-group-item">Morbi leo risus</li>
+					  <li class="list-group-item">Porta ac consectetur ac</li>
+					  <li class="list-group-item">Vestibulum at eros</li>
+					</ul>
+				</div>
+				);
+		}
+	}
+	
+	getTitle() {
+		switch (this.props.page) {
+		case 1: // start screen
+			return (
+				<h1 className='modal-title' id='pop-title'>Harvey Hundreds</h1>
+			);
+		case 2: // add score
+			return (
+				<h1 className='modal-title' id='pop-title'>New High Score!</h1>
+			);
+		default: // highscores
+			return (
+			<h1 className='modal-title' id='pop-title'>High Scores</h1>
+			);
+		}
+	}
+	
+	getFooter() {
+		switch (this.props.page) {
+		case 1: // start screen
+			return (
+				<div className='footer'>
+		        	<button type="button" className="btn btn-primary" data-dismiss="modal" onClick={this.props.toStart}>Start Game</button>
+		        	<button type="button" className="btn btn-secondary">How To Play</button>
+		        	<button type="button" className="btn btn-secondary">High Scores</button>
+				</div>
+			);
+		case 2: // add score
+			return (
+				<div className='footer'>
+		        	<button type="button" className="btn btn-secondary">Cancel</button>
+				</div>
+			);
+		default: // highscores
+			return (
+				<div className='modal-footer'>
+		        	<button type="button" className="btn primary">Back</button>
+				</div>
+			);
+		}
+	}
+	
+	render() {
+		let modal_classes = ['modal', 'fade', 'popup'].join(' ');
+		let modal_dialog_classes = ['modal-dialog', 'modal-dialog-centered', 'modal-lg'].join(' ');
+		let body = null;
+		let title = null;
+		let footer = null;
+		
+		return (
+			<div className={modal_classes} id='pop' role='dialog' tabIndex='-1' data-show>
+				<div className={modal_dialog_classes} role='document'>
+					<div className='modal-content'>
+						<div className='modal-header'>
+							{this.getTitle()}
+						</div>
+						<div className='modal-body'>
+							{this.getBody()}
+						</div>
+						<div className='modal-footer'>
+				        	{this.getFooter()}
+						</div>
+					</div>
+				</div>
+			</div>
+		);
+	}
+}
 
 class Card extends Component {
   render() {
@@ -50,8 +158,11 @@ class App extends Component {
   initGameState() {
     return {
       showModal: true,
+      modalVisible: true,
+      modalPage: 1,
       matches: 0,
       timeLeft: 60.0,
+      startTime: null,
       gameRunning: false,
       cardFlips: 0,
       cardSelected: null,
@@ -177,6 +288,8 @@ class App extends Component {
 	  }
 	  return ret;
   }
+  
+  
 
   /**
    * Sets all cards' "canClick" attribute to either true or false
@@ -268,7 +381,7 @@ class App extends Component {
 	        	//set state and enable clicks, or end game if there are no more matches
 	        	let keepGoing = function () {
 	        		//if time is up, just end the game
-	        		if (context.state.timeLeft <= 0.0) {
+	        		if (context.state.timeLeft === 0.0) {
 	        			return false;
 	        		}
 	        		var i;
@@ -278,8 +391,10 @@ class App extends Component {
 	        			}
 	        		}
 	        		//there are no pairs left in play, end the game.
+	        	    clearInterval(context.clock);
 	        		return false;
 	        	}
+	        	
 	        	context.setState((prevState, props) => ({
 	        		gameRunning: keepGoing() ? true : false,
         			matches: match ? prevState.matches + 1 : prevState.matches,
@@ -308,20 +423,15 @@ class App extends Component {
    * Decrement function for the in-game timer
    */
   timeDecrement() {
-    const running = this.state.gameRunning;
-    const time = this.state.timeLeft;
-    if (running) {
-      this.setState((prevState, props) => ({
-        timeLeft: prevState.timeLeft - 0.1
-      }));
-    }
-    if (time < 0.1) {
-      this.setState({
-        timeLeft: 0,
-        gameRunning: false
-      });
-      clearInterval(this.clock);
-    }
+	let nd = new Date();
+    let tp = (nd - this.state.startTime) / 1000;
+    let tl = (60.0 - tp) >= 0.1 ? 60.0 - tp : 0.0;
+	this.setState({
+		timeLeft: tl,
+	    gameRunning: tl > 0.0
+	});
+	if (tl === 0.0) clearInterval(this.clock);
+
   }
 
   /**
@@ -330,35 +440,51 @@ class App extends Component {
   startGame() {
     if (!this.state.gameRunning) {
       this.setState({
-        gameRunning: true
+        gameRunning: true,
+        showModal: false, 
+        startTime: new Date()
       });
       this.clock = setInterval(this.timeDecrement, 100);
     }
   }
 
+  showModal(page){
+	  	this.setState({
+	  		showModal: true,
+	  		modalPage: page
+	  	});
+	  	var evt = new MouseEvent('click', {
+			bubbles: true,
+			cancelable: false,
+			view: window
+		});
+		// If cancelled, don't dispatch our event
+		let elem = document.getElementById('modal_trigger')
+		elem.dispatchEvent(evt);
+  }
+  
+  componentDidUpdate(prevProps) {
+	  // Typical usage (don't forget to compare props):
+	  console.log("***** componentDidUpdate *****");
+	  console.log("Show Modal: "+ this.state.showModal);
+	  console.log("Modal Visible: "+ this.state.modalVisible);
+	  if (this.state.showModal && !this.state.modalVisible) {
+		  var evt = new MouseEvent('click', {
+				bubbles: true,
+				cancelable: false,
+				view: window
+			});
+			// If cancelled, don't dispatch our event
+			let elem = document.getElementById('modal_trigger');
+			elem.dispatchEvent(evt);
+	  }
+  }
+  
   render() {
 	  let cardClasses = ['c_container','col-3'].join(' ')
-	  let closeModal = () => this.setState({ showModal: false })
       return (
         <div className="game_container">
-        	<Modal
-        		show={this.state.showModal}
-        		backdrop='static'
-        		onHide={closeModal}
-            	aria-labelledby="ModalHeader">
-	        	<Modal.Header closeButton>
-	            	<Modal.Title id='ModalHeader'>A Title Goes here</Modal.Title>
-	            </Modal.Header>
-	            <Modal.Body>
-	            	<p>Some Content here</p>
-	            </Modal.Body>
-	            <Modal.Footer>
-	            <Modal.Dismiss className='btn btn-default'>Cancel</Modal.Dismiss>
-	            <button className='btn btn-primary'>
-	              Save
-	            </button>
-	          </Modal.Footer>
-        	</Modal>
+        	<Popup toStart={() => this.startGame()} page={this.state.modalPage}/>
             <div className="info_container">
               <p>Card Flips: {this.state.cardFlips}</p>
               <p>Money Earned: {this.moneyAmount()}</p>
@@ -398,9 +524,7 @@ class App extends Component {
 	              </div>
 	            </div>
             </div>
-            <button id="start" onClick={() => this.startGame()}>
-              {this.state.gameRunning ? "GAME RUNNING" : "GAME STOPPED"}
-            </button> 
+            <button type="button" id="modal_trigger" data-toggle="modal" data-backdrop="static" data-target="#pop">pop</button>
           </div>
       );
   }
